@@ -18,11 +18,17 @@
 // along with TerosHDL.  If not, see <https://www.gnu.org/licenses/>.
 
 import { p_result, p_options } from "./common";
+import { get_os } from '../../src/process/utils';
+import { OS } from '../../src/process/common';
 
 export class Local_process {
 
     async exec_wait(command: string, opt: p_options) {
         const exec = require("child_process").exec;
+        if (get_os() === OS.WINDOWS) {
+            const opt_win = {'cwd': opt.cwd, 'shell': "C:\\Program Files\\Git\\bin\\bash.exe"};
+            opt = opt_win;
+        }
         return new Promise((resolve) => {
             exec(command, opt, (error: number, stdout: string, stderr: string) => {
                 let error_code = 0;
@@ -47,7 +53,8 @@ export class Local_process {
 
     exec(command: string, opt: p_options, callback: (result: p_result) => void) {
         const exec_c = require("child_process").exec;
-        const exec_i = exec_c(command, opt, (error: number, stdout: string, stderr: string) => {
+        const opt_win = {'cwd': opt.cwd, 'shell': "C:\\Program Files\\Git\\bin\\bash.exe"};
+        const exec_i = exec_c(command, opt_win, (error: number, stdout: string, stderr: string) => {
             let error_code = 0;
             let successful = true;
             if (error !== undefined && error !== null) {

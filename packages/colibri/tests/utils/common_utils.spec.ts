@@ -19,14 +19,20 @@
 
 import * as common_utils from '../../src/utils/common_utils';
 import * as general from '../../src/common/general';
-
+import { get_os } from '../../src/process/utils';
+import { OS } from '../../src/process/common';
 describe('Common Utils', () => {
     it('makeid', () => {
         expect(common_utils.makeid(5)).toMatch(/[A-Za-z0-9]{5}/);
     });
 
     it('get_home_directory', () => {
-        expect(common_utils.get_home_directory()).toMatch(/\/home\/[a-z]+/);
+        if (get_os() === OS.WINDOWS) {
+            expect(common_utils.get_home_directory()).toMatch(/C:\\Users\\[a-z]/);
+        }else{
+            expect(common_utils.get_home_directory()).toMatch(/\/home\/[a-z]+/);
+        }
+        
     });
 
     it('get_hdl_language', () => {

@@ -19,6 +19,8 @@
 
 import { t_file, t_file_reduced } from '../../src/project_manager/common';
 import {File_manager} from '../../src/project_manager/list_manager/file';
+import { get_os } from '../../src/process/utils';
+import { OS } from '../../src/process/common';
 
 describe('list_manager: file', () => {
     let file_manager: File_manager;
@@ -78,8 +80,16 @@ describe('list_manager: file', () => {
             logical_name: 'example_logical',
             is_manual: false
         };
-        const expected_file : t_file = {
+        const expected_file_linux : t_file = {
             name: '../example.py',
+            is_include_file: false,
+            include_path: '',
+            logical_name: 'example_logical',
+            is_manual: false,
+            file_type: 'python'
+        };
+        const expected_file_win : t_file = {
+            name: '..\\example.py',
             is_include_file: false,
             include_path: '',
             logical_name: 'example_logical',
@@ -90,7 +100,11 @@ describe('list_manager: file', () => {
         file_manager.add(file);
         const result = file_manager.get(ref_path);
         expect(result).toHaveLength(1);
-        expect(result[0]).toEqual(expect.objectContaining(expected_file));
+        if (get_os() === OS.WINDOWS) {
+            expect(result[0]).toEqual(expect.objectContaining(expected_file_win));
+        }else{
+            expect(result[0]).toEqual(expect.objectContaining(expected_file_linux));
+        }
     });
 
     test('clear_automatic_files', () => {
