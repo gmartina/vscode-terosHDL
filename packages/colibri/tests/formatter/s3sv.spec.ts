@@ -22,7 +22,7 @@ import * as cfg from "../../src/config/config_declaration";
 import { normalize_breakline_windows } from "../../src/utils/common_utils";
 import { read_file_sync, save_file_sync,create_directory, remove_directory } from '../../src/utils/file_utils';
 
-const C_OUTPUT_BASE_PATH = path_lib.join(__dirname, "out");
+const C_OUTPUT_BASE_PATH = path_lib.join(__dirname, "out/s3sv");
 const C_EXPECTED_BASE_PATH = path_lib.join(__dirname, "helpers/expected");
 
 function create_output() {
