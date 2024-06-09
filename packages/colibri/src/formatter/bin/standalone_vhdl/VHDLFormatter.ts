@@ -82,7 +82,7 @@ String.prototype.count = function (text): number {
 
 String.prototype.regexStartsWith = function (pattern): boolean {
     const searchResult = this.search(pattern);
-    return searchResult == 0;
+    return searchResult >= 0;
 };
 
 String.prototype.regexIndexOf = function (pattern, startIndex) {
@@ -182,10 +182,12 @@ export function SetNewLinesAfterSymbols(text: string, newLineSettings: NewLineSe
                 //Fix unwanted match when generic and/or port names contain "generic" or "port" keywords.
                 rexString = "[^A-Za-z0-9_](" + upper + ")[^A-Za-z0-9_][ ]?([^ \r\n@])";
             }else{
+              //TODO: fix potential bug
                 rexString = "(" + upper + ")[ ]?([^ \r\n@])";
             }
             let regex: any = null;
             if (upper.regexStartsWith(/\w/)) {
+              //TODO: potential bug
                 regex = new RegExp("\\b" + rexString, "g");
             }
             else {
@@ -411,8 +413,27 @@ function GetCloseparentheseEndIndex(inputs: Array<string>, startIndex: number): 
     let closeParentheseCount = 0;
     for (let i = startIndex; i < inputs.length; i++) {
         const input = inputs[i];
-        openParentheseCount += input.count("(");
-        closeParentheseCount += input.count(")");
+        // Cornercase: close and open in the same line
+        if (input.count("(") >= 1 && 
+          input.count(")") >= 1) {
+          if (openParentheseCount > closeParentheseCount) {
+            // Lets find out if close is first
+            const close_index = input.indexOf(")");
+            const open_index = input.indexOf("(");
+            if (close_index < open_index) {
+              // closed parenthese found
+              return i-1;
+            }
+          } else {
+            // If both are found at the beginning of the search,
+            // only count open.
+            openParentheseCount += input.count("(");
+          }
+        } else {
+          openParentheseCount += input.count("(");
+          closeParentheseCount += input.count(")");
+        }
+
         if (openParentheseCount > 0
             && openParentheseCount <= closeParentheseCount) {
             return i;
@@ -457,7 +478,7 @@ export function beautifyPortGenericBlock(inputs: Array<string>, result: (Formatt
         }
     }
     if (firstLineHasParenthese && inputs[startIndex].indexOf("MAP") > 0) {
-        inputs[startIndex] = inputs[startIndex].replace(/([^\w])(MAP)\s+\(/g, '$1$2(');
+        inputs[startIndex] = inputs[startIndex].replace(/([^\w])(MAP)\s+\(/g, '$1$2 (');
     }
     result.push(new FormattedLine(inputs[startIndex], indent));
     if (secondLineHasParenthese) {
@@ -675,6 +696,15 @@ export function beautify3(inputs: Array<string>, result: (FormattedLine | Format
         endIndex = inputs.length - 1;
     }
     for (i = startIndex; i <= endIndex; i++) {
+        if (i === 12) {
+          console.log(inputs[i])
+        }
+        if (i === 13) {
+          console.log(inputs[i])
+        }
+        if (i === 5) {
+          console.log(inputs[i])
+        }
         if (indent < 0) {
             indent = 0;
         }
@@ -754,6 +784,9 @@ export function beautify3(inputs: Array<string>, result: (FormattedLine | Format
             }
             continue;
         }
+        //if (inputs[i].regexCount(/\)/) && inputs[i].regexCount(/PORT MAP/)) {
+        //  indent = 1;
+        //}
         result.push(new FormattedLine(input, indent));
         if (startIndex != 0
             && (input.regexStartsWith(regexBlockMidKeyWords)

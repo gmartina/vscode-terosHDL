@@ -113,6 +113,7 @@ export class Standalone_vhdl extends Base_formatter {
 
         if (opt.new_line_after_generic === cfg.e_formatter_standalone_new_line_after_generic.new_line) {
             new_line_settings.newLineAfterPush('GENERIC');
+            new_line_settings.newLineAfterPush('GENERIC MAP');
         }
         else if (opt.new_line_after_generic === cfg.e_formatter_standalone_new_line_after_generic.no_new_line) {
             new_line_settings.noNewLineAfterPush('GENERIC');
