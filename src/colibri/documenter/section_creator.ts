@@ -20,6 +20,7 @@
 import * as path_lib from 'path';
 import * as fs from 'fs';
 const showdown = require('showdown');
+const showdownKatex = require('showdown-katex');
 import * as common_hdl from "../parser/common";
 import * as common_documenter from "./common";
 import * as markdown_table from "./markdown_table";
@@ -37,7 +38,14 @@ export class Creator extends Section_creator_interface {
 
     constructor() {
         super();
-        this.converter = new showdown.Converter({ tables: true, ghCodeBlocks: true });
+        this.converter = new showdown.Converter({ 
+            tables: true, 
+            ghCodeBlocks: true,
+            extensions: [showdownKatex({
+                throwOnError: false,
+                displayMode: false
+            })]
+        });
         this.converter.setFlavor('github');
     }
 
@@ -455,7 +463,14 @@ export class Creator extends Section_creator_interface {
         if (configuration.process_visibility === cfg.e_documentation_general_process.only_commented) {
             process = this.get_elements_with_description(process);
         }
-        const converter = new showdown.Converter({ tables: true, ghCodeBlocks: true });
+        const converter = new showdown.Converter({ 
+            tables: true, 
+            ghCodeBlocks: true,
+            extensions: [showdownKatex({
+                throwOnError: false,
+                displayMode: false
+            })]
+        });
         converter.setFlavor('github');
 
         let md = "";
@@ -505,7 +520,14 @@ export class Creator extends Section_creator_interface {
         }
         let md = "";
         let html = "";
-        const converter = new showdown.Converter({ tables: true, ghCodeBlocks: true });
+        const converter = new showdown.Converter({ 
+            tables: true, 
+            ghCodeBlocks: true,
+            extensions: [showdownKatex({
+                throwOnError: false,
+                displayMode: false
+            })]
+        });
         converter.setFlavor('github');
 
         if (functions.length !== 0) {
@@ -564,7 +586,14 @@ export class Creator extends Section_creator_interface {
         }
         let md = "";
         let html = "";
-        const converter = new showdown.Converter({ tables: true, ghCodeBlocks: true });
+        const converter = new showdown.Converter({ 
+            tables: true, 
+            ghCodeBlocks: true,
+            extensions: [showdownKatex({
+                throwOnError: false,
+                displayMode: false
+            })]
+        });
         converter.setFlavor('github');
         if (tasks.length !== 0) {
             //Title
@@ -614,7 +643,14 @@ export class Creator extends Section_creator_interface {
         const instantiations = hdl_element.get_instantiation_array();
         let md = "";
         let html = "";
-        const converter = new showdown.Converter({ tables: true, ghCodeBlocks: true });
+        const converter = new showdown.Converter({ 
+            tables: true, 
+            ghCodeBlocks: true,
+            extensions: [showdownKatex({
+                throwOnError: false,
+                displayMode: false
+            })]
+        });
         converter.setFlavor('github');
 
         if (instantiations.length !== 0) {
@@ -650,7 +686,14 @@ export class Creator extends Section_creator_interface {
         output_type: common_documenter.doc_output_type): string {
 
         const translator = new translator_lib.Translator(configuration.language);
-        const converter = new showdown.Converter({ tables: true, ghCodeBlocks: true });
+        const converter = new showdown.Converter({ 
+            tables: true, 
+            ghCodeBlocks: true,
+            extensions: [showdownKatex({
+                throwOnError: false,
+                displayMode: false
+            })]
+        });
         let section = "";
         if (configuration.enable_fsm === false || fsm_list.length === 0) {
             return section;
@@ -732,10 +775,16 @@ export class Creator extends Section_creator_interface {
             const showdown_highlight = require("showdown-highlight");
             const converter = new showdown.Converter({
                 tables: true, ghCodeBlocks: true,
-                extensions: [showdown_highlight({
-                    // Whether to add the classes to the <pre> tag
-                    pre: true
-                })]
+                extensions: [
+                    showdown_highlight({
+                        // Whether to add the classes to the <pre> tag
+                        pre: true
+                    }),
+                    showdownKatex({
+                        throwOnError: false,
+                        displayMode: false
+                    })
+                ]
             });
 
             converter.setFlavor('github');

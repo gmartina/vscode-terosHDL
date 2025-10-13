@@ -18,6 +18,7 @@
 // along with TerosHDL.  If not, see <https://www.gnu.org/licenses/>.
 
 const showdown = require('showdown');
+const showdownKatex = require('showdown-katex');
 import * as translator_lib from "./translator";
 import * as common_hdl from "../parser/common";
 import * as common_documenter from "./common";
@@ -50,7 +51,14 @@ export class Section_creator_interface {
         let doc = '';
         let doc_raw = '';
 
-        const converter = new showdown.Converter({ tables: true, ghCodeBlocks: true });
+        const converter = new showdown.Converter({ 
+            tables: true, 
+            ghCodeBlocks: true,
+            extensions: [showdownKatex({
+                throwOnError: false,
+                displayMode: false
+            })]
+        });
         converter.setFlavor('github');
 
         // Title
@@ -169,7 +177,14 @@ export class Section_creator_interface {
     get_modports(modports: common_hdl.Modport_hdl[], translator: translator_lib.Translator,
         output_type: common_documenter.doc_output_type) {
 
-        const converter = new showdown.Converter({ tables: true, ghCodeBlocks: true });
+        const converter = new showdown.Converter({ 
+            tables: true, 
+            ghCodeBlocks: true,
+            extensions: [showdownKatex({
+                throwOnError: false,
+                displayMode: false
+            })]
+        });
         converter.setFlavor('github');
 
         let doc_markdown = '';

@@ -21,6 +21,7 @@ import * as common_documenter from "./common";
 import * as translator_lib from "./translator";
 import * as md from "./markdown_table";
 const showdown = require('showdown');
+const showdownKatex = require('showdown-katex');
 
 export function normalize_description(description: string): string {
     if(!description){
@@ -53,7 +54,14 @@ export function get_table_with_title(items: any, title: string, header: string[]
     translator: translator_lib.Translator,
     output_type: common_documenter.doc_output_type) {
 
-    const converter = new showdown.Converter({ tables: true, ghCodeBlocks: true });
+    const converter = new showdown.Converter({ 
+        tables: true, 
+        ghCodeBlocks: true,
+        extensions: [showdownKatex({
+            throwOnError: false,
+            displayMode: false
+        })]
+    });
     converter.setFlavor('github');
 
     let doc_markdown = '';
