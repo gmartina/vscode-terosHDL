@@ -46,7 +46,11 @@ export class configCheckerManager {
         this.formatterManager = formatterManager;
         this.schematicManager = schematicManager;
 
+        // Register the correct command
         vscode.commands.registerCommand('teroshdl.verifySetup', async () => await this.verifySetup());
+        
+        // Register backward compatibility alias for users with cached v7.0.x package.json
+        vscode.commands.registerCommand('teroshdl.configuration.verifySetup', async () => await this.verifySetup());
     }
 
     public async verifySetup() {
