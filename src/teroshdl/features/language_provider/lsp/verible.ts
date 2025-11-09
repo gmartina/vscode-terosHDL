@@ -15,6 +15,7 @@ import * as os from 'os';
 const exec = util.promisify(require('child_process').exec);
 
 import {
+    Executable,
     LanguageClient,
     LanguageClientOptions,
     ServerOptions,
@@ -190,8 +191,8 @@ export class Verilbe_lsp {
             }
         };
         
-        process.on('exit', () => cleanup((serverOptions.run as any).pid));
-        process.on('exit', () => cleanup((serverOptions.debug as any).pid));
+        process.on('exit', () => cleanup(((serverOptions as {run: Executable}).run as any).pid));
+        process.on('exit', () => cleanup(((serverOptions as {debug: Executable}).debug as any).pid));
 
         return serverOptions;
     }
