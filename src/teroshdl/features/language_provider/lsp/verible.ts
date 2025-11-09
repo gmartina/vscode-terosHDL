@@ -163,7 +163,7 @@ export class Verilbe_lsp {
                 args: args,
                 options: {
                     // Ensure process is killed when parent terminates (important for SSH scenarios)
-                    detached: false,
+                    detached: true,
                     shell: false
                 }
             },
@@ -172,11 +172,27 @@ export class Verilbe_lsp {
                 args: args,
                 options: {
                     // Ensure process is killed when parent terminates (important for SSH scenarios)
-                    detached: false,
+                    detached: true,
                     shell: false
                 }
             }
         };
+        
+        // Kill process group on exit
+        const cleanup = (pid) => {
+            if (pid) {
+                try {
+                    // Kill the process group
+                    process.kill(-pid);
+                } catch (e) {
+                    // Ignore errors
+                }
+            }
+        };
+        
+        process.on('exit', () => cleanup((serverOptions.run as any).pid));
+        process.on('exit', () => cleanup((serverOptions.debug as any).pid));
+
         return serverOptions;
     }
 }
