@@ -16,7 +16,6 @@ import * as utils from '../../utils/utils';
 const exec = util.promisify(require('child_process').exec);
 
 import {
-    Executable,
     LanguageClient,
     LanguageClientOptions,
     ServerOptions,
@@ -34,6 +33,7 @@ export class Rusthdl_lsp {
     private client: LanguageClient | undefined = undefined;
     private context: ExtensionContext;
     private languageServerDisposable;
+    private serverCommandPath: string | undefined;
     private manager: Multi_project_manager;
     public stop_client: boolean = false;
     private errorCounter = 0;
@@ -44,7 +44,7 @@ export class Rusthdl_lsp {
 
         this.context.subscriptions.push(
             vscode.commands.registerCommand('teroshdl.vhdlls.restart', async () => {
-                if (this.client != undefined && this.client.isRunning() && this.client.state === State.Running) {
+                if (this.client !== undefined && this.client.isRunning() && this.client.state === State.Running) {
                     try {
                         await this.client.restart();
                     } catch (error) {
@@ -59,6 +59,25 @@ export class Rusthdl_lsp {
                 }
             })
         );
+
+        // Ensure we attempt to kill any leftover servers when the extension host exits
+        process.on('exit', async () => {
+            try {
+                await this.killServerProcesses();
+            } catch (e) { /* ignore */ }
+        });
+        process.on('SIGINT', async () => {
+            try {
+                await this.killServerProcesses();
+            } catch (e) { /* ignore */ }
+            process.exit();
+        });
+        process.on('SIGHUP', async () => {
+            try {
+                await this.killServerProcesses();
+            } catch (e) { /* ignore */ }
+            process.exit();
+        });
     }
 
     async run_rusthdl(): Promise<boolean> {
@@ -157,6 +176,10 @@ export class Rusthdl_lsp {
             this.client = undefined;
             this.languageServerDisposable = undefined;
             log('=== DEACTIVATE COMPLETE ===');
+            // Try to kill any lingering server processes that match our server binary
+            try {
+                await this.killServerProcesses();
+            } catch (e) { /* ignore */ }
         }
     }
 
@@ -184,6 +207,8 @@ export class Rusthdl_lsp {
         args.push('--silent');
 
         let serverCommand = context.asAbsolutePath(languageServer);
+        // remember server path for cleanup
+        this.serverCommandPath = serverCommand;
         let serverOptions: ServerOptions = {
             run: {
                 command: serverCommand,
@@ -211,21 +236,45 @@ export class Rusthdl_lsp {
             }
         };
         
-        // Kill process group on exit
-        const cleanup = (pid) => {
-            if (pid) {
-                try {
-                    // Kill the process group
-                    process.kill(-pid);
-                } catch (e) {
-                    // Ignore errors
-                }
-            }
-        };
-        
-        process.on('exit', () => cleanup(((serverOptions as {run: Executable}).run as any).pid));
-        process.on('exit', () => cleanup(((serverOptions as {debug: Executable}).debug as any).pid));
+        // We rely on explicit cleanup (killServerProcesses) called on deactivate/exit
 
         return serverOptions;
+    }
+
+    private async killServerProcesses(): Promise<void> {
+        if (!this.serverCommandPath) {
+            return;
+        }
+        const serverPath = this.serverCommandPath;
+        const exec = require('child_process').exec;
+
+        // Use pgrep -f to find matching processes, then kill them gracefully, then force kill
+        return new Promise((resolve) => {
+            // Find pids matching the server path
+            exec(`pgrep -f "${serverPath}"`, (err, stdout) => {
+                if (err || !stdout) {
+                    return resolve();
+                }
+                const pids = stdout.split(/\s+/).map((s: string) => s.trim()).filter(Boolean);
+                if (pids.length === 0) {
+                    return resolve();
+                }
+                // First try SIGTERM
+                pids.forEach((pid: string) => {
+                    try {
+                        process.kill(parseInt(pid, 10), 'SIGTERM');
+                    } catch (e) { /* ignore */ }
+                });
+                // After short delay, force kill remaining
+                setTimeout(() => {
+                    pids.forEach((pid: string) => {
+                        try {
+                            process.kill(parseInt(pid, 10), 'SIGKILL');
+                        } catch (e) { /* ignore */ }
+                    });
+                    resolve();
+                }, 500);
+            });
+        });
     }
 }
