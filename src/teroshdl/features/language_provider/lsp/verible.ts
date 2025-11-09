@@ -9,6 +9,7 @@ import * as path from 'path';
 import vscode = require('vscode');
 import { ExtensionContext } from 'vscode';
 import util = require('util');
+import { debugLogger } from '../../../logger';
 import { Multi_project_manager } from 'colibri/project_manager/multi_project_manager';
 import * as os from 'os';
 
@@ -50,7 +51,7 @@ export class Verilbe_lsp {
                 //         this.errorCounter++;
                 //         this.client.dispose();
                 //         this.client = undefined;
-                //         console.log(error);
+                //         debugLogger.error(String(error));
                 //         if (this.errorCounter < 5) {
                 //             await this.run();
                 //         }
@@ -122,13 +123,12 @@ export class Verilbe_lsp {
 
     async check_run(binPath: string) {
         let command = binPath + ' --version';
-        // eslint-disable-next-line no-console
-        console.log(`[colibri][info] Linting with command: ${command}`);
+    debugLogger.info(`[colibri][info] Linting with command: ${command}`);
         const exec = require('child_process').exec;
         return new Promise((resolve) => {
             exec(command, (err, stdout: string, stderr) => {
                 if (stderr !== '') {
-                    console.log(`[verible][error] ${stderr}`);
+                    debugLogger.error(`[verible][error] ${stderr}`);
                 }
                 if (err !== null || !stdout.toLowerCase().includes('version')) {
                     resolve(false);
@@ -150,9 +150,9 @@ export class Verilbe_lsp {
             if (this.languageServerDisposable) {
                 this.languageServerDisposable.dispose();
             }
-            console.log('[verible] Language server stopped successfully');
+            debugLogger.info('[verible] Language server stopped successfully');
         } catch (error) {
-            console.error('[verible] Error stopping language server:', error);
+            debugLogger.error(`[verible] Error stopping language server: ${String(error)}`);
             // Force dispose even if stop fails
             if (this.languageServerDisposable) {
                 this.languageServerDisposable.dispose();
@@ -172,32 +172,71 @@ export class Verilbe_lsp {
             return;
         }
         const serverPath = this.serverCommandPath;
-        const exec = require('child_process').exec;
 
-        return new Promise((resolve) => {
-            exec(`pgrep -f "${serverPath}"`, (err, stdout) => {
-                if (err || !stdout) {
-                    return resolve();
-                }
-                const pids = stdout.split(/\s+/).map((s: string) => s.trim()).filter(Boolean);
-                if (pids.length === 0) {
-                    return resolve();
-                }
-                pids.forEach((pid: string) => {
-                    try {
-                        process.kill(parseInt(pid, 10), 'SIGTERM');
-                    } catch (e) { /* ignore */ }
-                });
-                setTimeout(() => {
+        try {
+            const cfg = vscode.workspace.getConfiguration('teroshdl.cleanup');
+            const enabled = cfg.get<boolean>('killServerProcesses.enabled', false);
+            if (!enabled) {
+                return;
+            }
+
+            // Safety: only perform process kill when running over an SSH remote session
+            const remoteName = (vscode.env.remoteName ?? '').toString();
+            const isSSH = remoteName.startsWith('ssh-remote');
+            if (!isSSH) {
+                debugLogger.info('[verible] Not an SSH remote session — skipping killServerProcesses');
+                return;
+            }
+
+            const grace = cfg.get<number>('killServerProcesses.gracePeriodMs', 500);
+
+            // Platform guard: pgrep is Unix-specific
+            if (process.platform === 'win32') {
+                return;
+            }
+
+            const execFile = require('child_process').execFile;
+            return new Promise((resolve) => {
+                execFile('pgrep', ['-f', serverPath], (err: any, stdout: string) => {
+                    if (err || !stdout) {
+                        return resolve();
+                    }
+                    const pids = stdout
+                        .split(/\s+/)
+                        .map((s: string) => s.trim())
+                        .filter(Boolean)
+                        .filter((x: string) => /^\d+$/.test(x));
+                    if (pids.length === 0) {
+                        return resolve();
+                    }
+                    // First try SIGTERM
                     pids.forEach((pid: string) => {
+                        const n = parseInt(pid, 10);
+                        if (Number.isNaN(n)) {
+                            return;
+                        }
                         try {
-                            process.kill(parseInt(pid, 10), 'SIGKILL');
+                            process.kill(n, 'SIGTERM');
                         } catch (e) { /* ignore */ }
                     });
-                    resolve();
-                }, 500);
+                    // After configurable delay, force kill remaining
+                    setTimeout(() => {
+                        pids.forEach((pid: string) => {
+                            const n = parseInt(pid, 10);
+                            if (Number.isNaN(n)) {
+                                return;
+                            }
+                            try {
+                                process.kill(n, 'SIGKILL');
+                            } catch (e) { /* ignore */ }
+                        });
+                        resolve();
+                    }, Math.max(0, grace));
+                });
             });
-        });
+        } catch (e) {
+            return;
+        }
     }
 
     embeddedVersion(languageServerDir: string): string {

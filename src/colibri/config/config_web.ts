@@ -703,7 +703,7 @@ body.vscode-high-contrast {
     <div class="settings-editor">
         <div class="settings-header">
             <div class="settings-header-controls">
-                <div class="settings-title" id="configTitle">Global Configuration</div>
+            <div class="settings-title" id="configTitle">Global Configuration</div>
             </div>
         </div>
         
@@ -905,8 +905,7 @@ body.vscode-high-contrast {
                     <i class="codicon codicon-question help-icon-button" onclick="window.open('https://terostechnology.github.io/terosHDLdoc/docs/installation_checklist/installation', '_blank')" title="Go To Documentation"></i>
                 </div>
                 <div class="settings-group-description"></div>
-                  
-                  
+
                     <div class="setting-item">
                         <div class="setting-item-label">
                             Python3 binary path (e.g.: /usr/bin/python3). Empty if you want to use the system path. <strong>Install teroshdl. E.g: pip3 install teroshdl</strong> <a href=https://terostechnology.github.io/terosHDLdoc/docs/installation_checklist/installation#2-python3>https://terostechnology.github.io/terosHDLdoc/docs/installation_checklist/installation#2-python3</a>
@@ -957,7 +956,11 @@ body.vscode-high-contrast {
                         </div>
                     </div>
                   
-                  
+                    <div class="setting-item">
+                        <div class="setting-item-label">
+                            <span id="cleanupIndicator" onclick="open_cleanup_settings()" style="font-weight:600;margin-left:8px;cursor:pointer;" title="Click to open cleanup settings">unknown</span>
+                        </div>
+                    </div>
                   
             </div>
             <div class="settings-section" id="documentation-general">
@@ -5782,6 +5785,12 @@ body.vscode-high-contrast {
     });
   }
 
+    function open_cleanup_settings(){
+        vscode.postMessage({
+            command: 'openCleanupSettings'
+        });
+    }
+
   window.addEventListener('message', event => {
       const message = event.data;
       switch (message.command) {
@@ -5793,6 +5802,13 @@ body.vscode-high-contrast {
               if (tool != undefined && tool != ""){
                 enable_tab("tools", tool);
               }
+                  try {
+                      const el = document.getElementById('cleanupIndicator');
+                      if (el) {
+                          const effective = message.cleanupEffective || (message.cleanupEnabled ? ( (message.remoteName||'').startsWith('ssh-remote') ? 'enabled (SSH only)' : 'enabled (not active: not SSH)') : 'disabled');
+                          el.textContent = 'Auto cleanup language server processes: ' + effective;
+                      }
+                  } catch (e) { /* ignore */ }
               break;
       }
   });
