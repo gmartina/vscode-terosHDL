@@ -4,7 +4,6 @@ on:
   push:
     branches:
       - dev
-      - i726-vhd-ls-proc
   pull_request:
     branches:
       - dev
