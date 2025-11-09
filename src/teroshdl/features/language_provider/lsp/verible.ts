@@ -123,7 +123,24 @@ export class Verilbe_lsp {
         if (!this.client) {
             return undefined;
         }
-        await this.client.stop(1000);
+        try {
+            // Increase timeout to 5 seconds to ensure proper shutdown in SSH scenarios
+            await this.client.stop(5000);
+            // Explicitly dispose of the language server disposable
+            if (this.languageServerDisposable) {
+                this.languageServerDisposable.dispose();
+            }
+            console.log('[verible] Language server stopped successfully');
+        } catch (error) {
+            console.error('[verible] Error stopping language server:', error);
+            // Force dispose even if stop fails
+            if (this.languageServerDisposable) {
+                this.languageServerDisposable.dispose();
+            }
+        } finally {
+            this.client = undefined;
+            this.languageServerDisposable = undefined;
+        }
     }
 
     embeddedVersion(languageServerDir: string): string {
@@ -143,11 +160,21 @@ export class Verilbe_lsp {
         let serverOptions: ServerOptions = {
             run: {
                 command: serverCommand,
-                args: args
+                args: args,
+                options: {
+                    // Ensure process is killed when parent terminates (important for SSH scenarios)
+                    detached: false,
+                    shell: false
+                }
             },
             debug: {
                 command: serverCommand,
-                args: args
+                args: args,
+                options: {
+                    // Ensure process is killed when parent terminates (important for SSH scenarios)
+                    detached: false,
+                    shell: false
+                }
             }
         };
         return serverOptions;

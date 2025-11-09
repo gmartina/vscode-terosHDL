@@ -118,10 +118,45 @@ export class Rusthdl_lsp {
     }
 
     async deactivate() {
+        const logFile = require('os').homedir() + '/vhdl_ls_deactivate.log';
+        const log = (msg: string) => {
+            try {
+                require('fs').appendFileSync(logFile, `${new Date().toISOString()} - ${msg}\n`);
+            } catch (e) { /* ignore */ }
+        };
+        
+        log('=== DEACTIVATE CALLED ===');
         if (!this.client) {
+            log('No client to deactivate');
             return undefined;
         }
-        await this.client.stop(1000);
+        try {
+            log(`Client state before stop: ${this.client.state}`);
+            log('Calling client.stop(5000)...');
+            // Increase timeout to 5 seconds to ensure proper shutdown in SSH scenarios
+            await this.client.stop(5000);
+            log('Client stopped successfully');
+            
+            // Explicitly dispose of the language server disposable
+            if (this.languageServerDisposable) {
+                log('Disposing languageServerDisposable...');
+                this.languageServerDisposable.dispose();
+                log('Disposable cleaned up');
+            }
+            console.log('[vhdl_ls] Language server stopped successfully');
+        } catch (error) {
+            log(`ERROR during stop: ${error}`);
+            console.error('[vhdl_ls] Error stopping language server:', error);
+            // Force dispose even if stop fails
+            if (this.languageServerDisposable) {
+                this.languageServerDisposable.dispose();
+                log('Disposable force-disposed after error');
+            }
+        } finally {
+            this.client = undefined;
+            this.languageServerDisposable = undefined;
+            log('=== DEACTIVATE COMPLETE ===');
+        }
     }
 
     embeddedVersion(languageServerDir: string): string {
@@ -155,7 +190,10 @@ export class Rusthdl_lsp {
                 options: {
                     env: {
                         VHDL_LS_CONFIG: this.fileListPath
-                    }
+                    },
+                    // Ensure process is killed when parent terminates (important for SSH scenarios)
+                    detached: false,
+                    shell: false
                 }
             },
             debug: {
@@ -164,7 +202,10 @@ export class Rusthdl_lsp {
                 options: {
                     env: {
                         VHDL_LS_CONFIG: this.fileListPath
-                    }
+                    },
+                    // Ensure process is killed when parent terminates (important for SSH scenarios)
+                    detached: false,
+                    shell: false
                 }
             }
         };
