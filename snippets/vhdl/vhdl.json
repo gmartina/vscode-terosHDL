@@ -635,5 +635,28 @@
 			"$0"
 		],
 		"description": "concurrent with select declaration"
+	},
+	"Others One": {
+		"prefix": "o1",
+		"body": [
+			"(others => '1')"
+		],
+		"description": "others aggregate set to '1'"
+	},
+	"Others Zero": {
+		"prefix": "o0",
+		"body": [
+			"(others => '0')"
+		],
+		"description": "others aggregate set to '0'"
+	},
+	"Comment Title": {
+		"prefix": "title",
+		"body": [
+			"------------------------",
+			"-- ${1:Title}",
+			"------------------------"
+		],
+		"description": "Comment title"
 	}
 }
