@@ -1,6 +1,6 @@
 {
-    "name": "teroshdl",
-    "displayName": "TerosHDL",
+    "name": "teroshdl-clearance",
+    "displayName": "TerosHDLclearance",
     "publisher": "teros-technology",
     "description": "HDL support for VHDL, Verilog, SystemVerilog: syntax highlighting, snippets, and file icons",
     "version": "8.0.5",
