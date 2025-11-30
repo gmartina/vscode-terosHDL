@@ -18,6 +18,7 @@
 // You should have received a copy of the GNU General Public License
 // along with TerosHDL.  If not, see <https://www.gnu.org/licenses/>.
 
+import * as jsYaml from 'js-yaml';
 import {
     t_file, t_action_result, t_watcher,
     e_watcher_type,
@@ -571,8 +572,54 @@ export class Project_manager extends ConfigManager {
         return utils.get_edam_json(this.get_project_definition(), undefined, reference_path);
     }
 
+    /**
+     * Get EDAM JSON for saving to disk. This version only includes the configuration
+     * differences from the global settings, avoiding local paths being saved in the
+     * project file. This is useful for sharing projects across different machines
+     * where tool paths may differ.
+     * @param reference_path Optional reference path for relative paths
+     * @returns EDAM JSON with only the project-specific configuration overrides
+     */
+    public get_edam_json_for_save(reference_path?: string) {
+        const files = this.files.get(reference_path);
+        let top_level = "";
+        const top_level_list = this.toplevel_path.get(reference_path);
+        if (top_level_list.length > 0) {
+            top_level = top_level_list[0];
+        }
+
+        // Create EDAM JSON with only the diff config (excludes local paths from global settings)
+        // Also excludes tool_options which contain machine-specific paths
+        const edam_json = {
+            name: this.name,
+            project_disk_path: this.projectDiskPath,
+            project_type: this.getProjectType(),
+            toplevel: top_level,
+            files: files,
+            hooks: this.hooks.get(),
+            watchers: this.watchers.get(reference_path),
+            configuration: this.get_diff_config()  // Only project-specific config overrides
+            // Note: tool_options is intentionally excluded as it contains local paths
+        };
+
+        return edam_json;
+    }
+
     public get_edam_yaml(reference_path?: string) {
         return utils.get_edam_yaml(this.get_project_definition(), undefined, reference_path);
+    }
+
+    /**
+     * Get EDAM YAML for saving/sharing projects.
+     * Only includes project-specific configuration (diff from global config),
+     * excluding machine-local paths like tool installation directories.
+     * 
+     * @param reference_path Optional reference path for relative file paths
+     * @returns YAML string suitable for sharing via VCS
+     */
+    public get_edam_yaml_for_save(reference_path?: string): string {
+        const edam_json = this.get_edam_json_for_save(reference_path);
+        return jsYaml.dump(edam_json);
     }
 
     public get_toml(reference_path?: string) {
@@ -627,7 +674,7 @@ export class Project_manager extends ConfigManager {
     }
 
     public save_edam_yaml(output_path: string) {
-        const edam_yaml = this.get_edam_yaml(output_path);
+        const edam_yaml = this.get_edam_yaml_for_save(output_path);
         file_utils.save_file_sync(output_path, edam_yaml);
     }
 

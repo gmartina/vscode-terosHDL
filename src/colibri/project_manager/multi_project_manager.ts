@@ -158,7 +158,7 @@ export class Multi_project_manager {
     public save(): void {
         const prj_list: any[] = [];
         this.project_manager_list.forEach(prj => {
-            prj_list.push(prj.get_edam_json());
+            prj_list.push(prj.get_edam_json_for_save());
         });
 
         let selected_project_name;

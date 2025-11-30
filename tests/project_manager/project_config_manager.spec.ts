@@ -204,10 +204,43 @@ describe('ProjectManager Configuration', () => {
         originalConfig.general.general.pypath = "my/path";
         projectManager.set_config(originalConfig);
 
-        const newProjectManager = await Project_manager.fromJson(projectManager.get_edam_json(), "", new ProjectEmitter(), "");
+        // Use get_edam_json_for_save() which is what multi_project_manager uses when saving to disk
+        const newProjectManager = await Project_manager.fromJson(projectManager.get_edam_json_for_save(), "", new ProjectEmitter(), "");
 
         expect(newProjectManager.get_config()).toEqual(originalConfig);
     });
 
-});
+    it('should not save global config paths when saving project', async () => {
+        // Set a global config value (like a local tool path)
+        GlobalConfigManager.getInstance().get_config().tools.ghdl.installation_path = "/local/machine/path/to/ghdl";
+        
+        // Get the saved JSON (as it would be saved to disk)
+        const savedJson = projectManager.get_edam_json_for_save();
+        
+        // The saved configuration should NOT contain the global path
+        // (it should be undefined since it's not different from default/global)
+        expect(savedJson.configuration.tools.ghdl.installation_path).toBeUndefined();
+    });
 
+    it('should save project-specific values but not global paths', async () => {
+        // Set a global config value (like a local tool path)
+        GlobalConfigManager.getInstance().get_config().tools.ghdl.installation_path = "/local/machine/path/to/ghdl";
+        
+        // Set a project-specific value that differs from global
+        // Note: ghdl.verbose defaults to true, so we set it to false to create a diff
+        const originalConfig = projectManager.get_config();
+        originalConfig.tools.ghdl.verbose = false;  // different from default (true)
+        projectManager.set_config(originalConfig);
+        
+        // Get the saved JSON
+        const savedJson = projectManager.get_edam_json_for_save();
+        
+        // KEY BEHAVIOR: Local paths from global config are NOT saved to project file
+        // This is what fixes the GitHub issue - project files can now be shared across machines
+        expect(savedJson.configuration.tools.ghdl.installation_path).toBeUndefined();
+        
+        // Project-specific overrides ARE saved
+        expect(savedJson.configuration.tools.ghdl.verbose).toBe(false);
+    });
+
+});
