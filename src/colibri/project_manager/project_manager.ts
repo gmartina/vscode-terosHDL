@@ -588,6 +588,10 @@ export class Project_manager extends ConfigManager {
             top_level = top_level_list[0];
         }
 
+        // Get diff config, remove undefined values (which represent matching global settings),
+        // and also remove values that match the default config (no need to save defaults)
+        const diffConfig = strip_undefined_and_defaults(this.get_diff_config(), get_default_config());
+
         // Create EDAM JSON with only the diff config (excludes local paths from global settings)
         // Also excludes tool_options which contain machine-specific paths
         const edam_json = {
@@ -598,7 +602,7 @@ export class Project_manager extends ConfigManager {
             files: files,
             hooks: this.hooks.get(),
             watchers: this.watchers.get(reference_path),
-            configuration: this.get_diff_config()  // Only project-specific config overrides
+            configuration: diffConfig  // Only project-specific config overrides
             // Note: tool_options is intentionally excluded as it contains local paths
         };
 
@@ -905,4 +909,55 @@ function diff_config<T extends Record<string, any>>(config1: T, config2: T): T {
     });
 
     return differences as T;
+}
+
+/**
+ * Recursively strips undefined values from an object.
+ * Also removes empty objects (objects with no remaining keys after stripping).
+ * Also removes values that match the default config (no need to save defaults).
+ * This is used to clean up diff configs before serialization to YAML/JSON.
+ */
+function strip_undefined_and_defaults<T extends Record<string, any>>(
+    obj: T, 
+    defaults: Record<string, any>
+): Partial<T> {
+    const result: Record<string, any> = {};
+
+    for (const key of Object.keys(obj)) {
+        const value = obj[key];
+        const defaultValue = defaults?.[key];
+        
+        if (value === undefined) {
+            // Skip undefined values
+            continue;
+        }
+
+        // Skip values that match the default
+        if (value === defaultValue) {
+            continue;
+        }
+
+        // For arrays, compare by JSON stringification
+        if (Array.isArray(value) && Array.isArray(defaultValue)) {
+            if (JSON.stringify(value) === JSON.stringify(defaultValue)) {
+                continue;
+            }
+            result[key] = value;
+            continue;
+        }
+        
+        if (value !== null && typeof value === 'object' && !Array.isArray(value)) {
+            // Recursively strip nested objects
+            const stripped = strip_undefined_and_defaults(value, defaultValue || {});
+            // Only include if the stripped object has keys
+            if (Object.keys(stripped).length > 0) {
+                result[key] = stripped;
+            }
+        } else {
+            // Keep other values (primitives, null) that differ from defaults
+            result[key] = value;
+        }
+    }
+
+    return result as Partial<T>;
 }
