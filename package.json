@@ -59,6 +59,11 @@
                 "path": "./syntaxes/tcl/tcl.tmLanguage.json"
             },
             {
+                "language": "pro",
+                "scopeName": "source.pro",
+                "path": "./syntaxes/pro/pro.tmLanguage.json"
+            },
+            {
                 "language": "xdc",
                 "scopeName": "source.xdcconstraints",
                 "path": "./syntaxes/xdc.tmLanguage"
@@ -102,7 +107,13 @@
                 "id": "tcl",
                 "aliases": ["TCL", "tcl"],
                 "configuration": "./configs/tcl.configuration.json",
-                "extensions": [".tcl", ".pro"]
+                "extensions": [".tcl"]
+            },
+            {
+                "id": "pro",
+                "aliases": ["PRO", "pro"],
+                "configuration": "./configs/pro.configuration.json",
+                "extensions": [".pro"]
             },
             {
                 "id": "ucf",
@@ -145,6 +156,10 @@
             {
                 "language": "tcl",
                 "path": "./snippets/tcl/tcl.json"
+            },
+            {
+                "language": "pro",
+                "path": "./snippets/pro/pro.json"
             },
             {
                 "language": "xdc",

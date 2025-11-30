@@ -1,0 +1,342 @@
+{
+    "OSVVM Build": {
+        "prefix": "build",
+        "body": [
+            "build ${1:path/to/file.pro}"
+        ],
+        "description": "Include and run another OSVVM build script"
+    },
+    "OSVVM Include": {
+        "prefix": "include",
+        "body": [
+            "include ${1:path/to/file.pro}"
+        ],
+        "description": "Include another OSVVM script"
+    },
+    "OSVVM Library": {
+        "prefix": "library",
+        "body": [
+            "library ${1:library_name}"
+        ],
+        "description": "Set or create a library for subsequent analyze commands"
+    },
+    "OSVVM Analyze": {
+        "prefix": "analyze",
+        "body": [
+            "analyze ${1:path/to/file.vhd}"
+        ],
+        "description": "Analyze/compile a VHDL file"
+    },
+    "OSVVM Simulate": {
+        "prefix": "simulate",
+        "body": [
+            "simulate ${1:top_level_entity}"
+        ],
+        "description": "Run simulation on a design"
+    },
+    "OSVVM RunTest": {
+        "prefix": "runtest",
+        "body": [
+            "RunTest ${1:test_name}"
+        ],
+        "description": "Run a single test case"
+    },
+    "OSVVM TestCase": {
+        "prefix": "testcase",
+        "body": [
+            "TestCase ${1:test_name}"
+        ],
+        "description": "Define a test case"
+    },
+    "OSVVM TestSuite": {
+        "prefix": "testsuite",
+        "body": [
+            "TestSuite ${1:suite_name}"
+        ],
+        "description": "Define a test suite"
+    },
+    "OSVVM SkipTest": {
+        "prefix": "skiptest",
+        "body": [
+            "SkipTest ${1:test_name} ${2:reason}"
+        ],
+        "description": "Skip a test with a reason"
+    },
+    "OSVVM StartBuild": {
+        "prefix": "startbuild",
+        "body": [
+            "StartBuild ${1:build_name}"
+        ],
+        "description": "Start a new OSVVM build"
+    },
+    "OSVVM EndBuild": {
+        "prefix": "endbuild",
+        "body": [
+            "EndBuild"
+        ],
+        "description": "End the current OSVVM build"
+    },
+    "OSVVM SetLibraryDirectory": {
+        "prefix": "setlibdir",
+        "body": [
+            "SetLibraryDirectory ${1:path}"
+        ],
+        "description": "Set the library output directory"
+    },
+    "OSVVM LinkLibrary": {
+        "prefix": "linklibrary",
+        "body": [
+            "LinkLibrary ${1:library_name} ${2:path}"
+        ],
+        "description": "Link to an external library"
+    },
+    "OSVVM SetVHDLVersion": {
+        "prefix": "setvhdlversion",
+        "body": [
+            "SetVHDLVersion ${1|2008,2019,1993,2002|}"
+        ],
+        "description": "Set VHDL standard version"
+    },
+    "OSVVM SetSimulatorResolution": {
+        "prefix": "setsimres",
+        "body": [
+            "SetSimulatorResolution ${1|ps,ns,us,ms|}"
+        ],
+        "description": "Set simulation time resolution"
+    },
+    "OSVVM SetSaveWaves": {
+        "prefix": "setsavewaves",
+        "body": [
+            "SetSaveWaves ${1|true,false|}"
+        ],
+        "description": "Enable or disable waveform saving"
+    },
+    "OSVVM SetInteractiveMode": {
+        "prefix": "setinteractive",
+        "body": [
+            "SetInteractiveMode ${1|true,false|}"
+        ],
+        "description": "Enable or disable interactive mode"
+    },
+    "OSVVM SetDebugMode": {
+        "prefix": "setdebugmode",
+        "body": [
+            "SetDebugMode ${1|true,false|}"
+        ],
+        "description": "Enable or disable debug mode"
+    },
+    "OSVVM SetLogSignals": {
+        "prefix": "setlogsignals",
+        "body": [
+            "SetLogSignals ${1|true,false|}"
+        ],
+        "description": "Enable or disable signal logging"
+    },
+    "OSVVM SetCoverageAnalyzeEnable": {
+        "prefix": "setcovanalyze",
+        "body": [
+            "SetCoverageAnalyzeEnable ${1|true,false|}"
+        ],
+        "description": "Enable or disable coverage analysis"
+    },
+    "OSVVM SetCoverageSimulateEnable": {
+        "prefix": "setcovsim",
+        "body": [
+            "SetCoverageSimulateEnable ${1|true,false|}"
+        ],
+        "description": "Enable or disable coverage simulation"
+    },
+    "OSVVM ReportBuildStatus": {
+        "prefix": "reportstatus",
+        "body": [
+            "ReportBuildStatus"
+        ],
+        "description": "Report the current build status"
+    },
+    "OSVVM CreateBuildReports": {
+        "prefix": "createreports",
+        "body": [
+            "CreateBuildReports"
+        ],
+        "description": "Create all build reports (HTML, YAML, etc.)"
+    },
+    "OSVVM StartTranscript": {
+        "prefix": "starttranscript",
+        "body": [
+            "StartTranscript ${1:filename}"
+        ],
+        "description": "Start transcript logging to a file"
+    },
+    "OSVVM StopTranscript": {
+        "prefix": "stoptranscript",
+        "body": [
+            "StopTranscript"
+        ],
+        "description": "Stop transcript logging"
+    },
+    "OSVVM Full Project Template": {
+        "prefix": "osvvmproject",
+        "body": [
+            "# OSVVM Project Build Script",
+            "# ${1:Project Description}",
+            "",
+            "# Set VHDL version",
+            "SetVHDLVersion 2008",
+            "",
+            "# Start the build",
+            "StartBuild ${2:project_name}",
+            "",
+            "# Create/set library",
+            "library ${3:work}",
+            "",
+            "# Analyze source files",
+            "analyze ${4:src/design.vhd}",
+            "",
+            "# Analyze testbench files", 
+            "analyze ${5:tb/testbench.vhd}",
+            "",
+            "# Run tests",
+            "RunTest ${6:tb_top}",
+            "",
+            "# End build and create reports",
+            "EndBuild",
+            "CreateBuildReports"
+        ],
+        "description": "Complete OSVVM project build template"
+    },
+    "OSVVM Test Template": {
+        "prefix": "osvvmtest",
+        "body": [
+            "# Test: ${1:Test Name}",
+            "TestSuite ${2:suite_name}",
+            "",
+            "TestCase ${3:test_case_1}",
+            "RunTest ${4:tb_entity} ${5:generic_options}",
+            "",
+            "$0"
+        ],
+        "description": "OSVVM test suite template"
+    },
+    "OSVVM Library Setup": {
+        "prefix": "osvvmlibsetup",
+        "body": [
+            "# Library Setup",
+            "SetLibraryDirectory ${1:./lib}",
+            "",
+            "# Link OSVVM libraries",
+            "LinkLibrary osvvm      \\$$::OSVVM_DIR/osvvm",
+            "LinkLibrary osvvm_common \\$$::OSVVM_DIR/Common",
+            "",
+            "# Create project library",
+            "library ${2:work}",
+            "$0"
+        ],
+        "description": "OSVVM library setup template"
+    },
+    "OSVVM Coverage Options": {
+        "prefix": "osvvmcoverage",
+        "body": [
+            "# Coverage Configuration",
+            "SetCoverageAnalyzeEnable true",
+            "SetCoverageSimulateEnable true",
+            "SetCoverageAnalyzeOptions \"${1:options}\"",
+            "SetCoverageSimulateOptions \"${2:options}\"",
+            "$0"
+        ],
+        "description": "OSVVM coverage configuration"
+    },
+    "OSVVM Simulation Options": {
+        "prefix": "osvvmsimopts",
+        "body": [
+            "# Simulation Options",
+            "SetSimulatorResolution ${1|ps,ns|}",
+            "SetSaveWaves ${2|true,false|}",
+            "SetLogSignals ${3|true,false|}",
+            "SetInteractiveMode ${4|false,true|}",
+            "$0"
+        ],
+        "description": "OSVVM simulation options template"
+    },
+    "TCL For Loop": {
+        "prefix": "for",
+        "body": [
+            "for {set ${1:i} ${2:0}} {\\$${1:i} < ${3:10}} {incr ${1:i}} {",
+            "\t$0",
+            "}"
+        ],
+        "description": "TCL For Loop"
+    },
+    "TCL Foreach": {
+        "prefix": "foreach",
+        "body": [
+            "foreach ${1:item} ${2:list} {",
+            "\t$0",
+            "}"
+        ],
+        "description": "TCL Foreach Loop"
+    },
+    "TCL If": {
+        "prefix": "if",
+        "body": [
+            "if {${1:condition}} {",
+            "\t$0",
+            "}"
+        ],
+        "description": "TCL If Statement"
+    },
+    "TCL If-Else": {
+        "prefix": "ifelse",
+        "body": [
+            "if {${1:condition}} {",
+            "\t$2",
+            "} else {",
+            "\t$0",
+            "}"
+        ],
+        "description": "TCL If-Else Statement"
+    },
+    "TCL Proc": {
+        "prefix": "proc",
+        "body": [
+            "proc ${1:name} {${2:args}} {",
+            "\t$0",
+            "}"
+        ],
+        "description": "TCL Procedure"
+    },
+    "TCL Set Variable": {
+        "prefix": "set",
+        "body": [
+            "set ${1:varname} ${2:value}"
+        ],
+        "description": "TCL Set Variable"
+    },
+    "TCL Puts": {
+        "prefix": "puts",
+        "body": [
+            "puts \"${1:message}\""
+        ],
+        "description": "TCL Print Statement"
+    },
+    "Comment Header": {
+        "prefix": "header",
+        "body": [
+            "# ============================================================================",
+            "# ${1:Title}",
+            "# ${2:Description}",
+            "# ============================================================================",
+            "$0"
+        ],
+        "description": "Comment header block"
+    },
+    "Comment Section": {
+        "prefix": "section",
+        "body": [
+            "# ----------------------------------------------------------------------------",
+            "# ${1:Section Title}",
+            "# ----------------------------------------------------------------------------",
+            "$0"
+        ],
+        "description": "Comment section divider"
+    }
+}

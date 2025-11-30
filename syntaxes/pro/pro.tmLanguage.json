@@ -1,0 +1,205 @@
+{
+  "fileTypes": [
+    "pro"
+  ],
+  "scopeName": "source.pro",
+  "name": "PRO",
+  "patterns": [
+    {
+      "include": "#comments"
+    },
+    {
+      "include": "#strings"
+    },
+    {
+      "include": "#variables"
+    },
+    {
+      "include": "#osvvm-commands"
+    },
+    {
+      "include": "#osvvm-functions"
+    },
+    {
+      "include": "#tcl-keywords"
+    },
+    {
+      "include": "#tcl-commands"
+    },
+    {
+      "include": "#numbers"
+    },
+    {
+      "include": "#operators"
+    },
+    {
+      "include": "#brackets"
+    }
+  ],
+  "repository": {
+    "comments": {
+      "patterns": [
+        {
+          "name": "comment.line.number-sign.osvvm",
+          "match": "#.*$"
+        }
+      ]
+    },
+    "strings": {
+      "patterns": [
+        {
+          "name": "string.quoted.double.osvvm",
+          "begin": "\"",
+          "end": "\"",
+          "patterns": [
+            {
+              "name": "constant.character.escape.osvvm",
+              "match": "\\\\."
+            },
+            {
+              "include": "#variables"
+            }
+          ]
+        },
+        {
+          "name": "string.quoted.curly.osvvm",
+          "begin": "\\{",
+          "end": "\\}",
+          "patterns": [
+            {
+              "include": "#strings"
+            }
+          ]
+        }
+      ]
+    },
+    "variables": {
+      "patterns": [
+        {
+          "name": "variable.other.osvvm",
+          "match": "\\$[a-zA-Z_][a-zA-Z0-9_]*"
+        },
+        {
+          "name": "variable.other.bracket.osvvm",
+          "match": "\\$\\{[^}]+\\}"
+        },
+        {
+          "name": "variable.language.osvvm",
+          "match": "\\$::[a-zA-Z_][a-zA-Z0-9_]*"
+        }
+      ]
+    },
+    "osvvm-commands": {
+      "patterns": [
+        {
+          "name": "keyword.control.osvvm.build",
+          "match": "\\b(build|include|library|analyze|simulate|RunTest|SkipTest|TestCase|TestSuite|SetTranscriptType|CreateDirectory|ChangeWorkingDirectory|GetVHDLVersion|SetVHDLVersion)\\b"
+        },
+        {
+          "name": "keyword.control.osvvm.library",
+          "match": "\\b(LinkLibrary|LinkLibraryDirectory|SetLibraryDirectory|GetLibraryDirectory|MapLibraries|MapAllLibraries|UnmapLibraries)\\b"
+        },
+        {
+          "name": "keyword.control.osvvm.simulation",
+          "match": "\\b(SetSimulatorResolution|GetSimulatorResolution|SetSecondSimulationTopLevel|SetCoverageSimulateEnable|SetCoverageSimulateOptions|SetCoverageAnalyzeEnable|SetCoverageAnalyzeOptions|GetCoverageSimulateOptions)\\b"
+        },
+        {
+          "name": "keyword.control.osvvm.report",
+          "match": "\\b(ReportBuildStatus|ReportBuildYaml|CreateBuildReports|OpenBuildHtml|OpenSimulationReportFile|CloseBuildHtml|Report2Html|Report2Junit|Report2Csv|Simulate2Html)\\b"
+        },
+        {
+          "name": "keyword.control.osvvm.vendor",
+          "match": "\\b(SetVhdlAnalyzeOptions|SetVerilogAnalyzeOptions|SetSimulatorScriptRecordSeparator|SetExtendedAnalyzeOptions|SetExtendedSimulateOptions|SetExtendedRunOptions|SetSaveWaves|SetInteractiveMode|SetDebugMode|SetLogSignals)\\b"
+        },
+        {
+          "name": "keyword.control.osvvm.project",
+          "match": "\\b(StartBuild|StartBuildYaml|EndBuild|EndSimulation|StartTranscript|StopTranscript|SetBuildName|GetBuildName)\\b"
+        }
+      ]
+    },
+    "osvvm-functions": {
+      "patterns": [
+        {
+          "name": "support.function.osvvm.testbench",
+          "match": "\\b(TestName|SetTestName|Log|Alert|AlertIf|AlertIfNot|AlertIfEqual|AlertIfNotEqual|AffirmIf|AffirmIfNot|AffirmIfEqual|AffirmIfNotEqual|GetAlertCount|GetAffirmCount|ReportAlerts|ClearAlerts)\\b"
+        },
+        {
+          "name": "support.function.osvvm.coverage",
+          "match": "\\b(NewCoverage|AddCross|AddBins|ICover|GetCov|WriteCovDb|ReadCovDb|WriteCovHtml|WriteCovYaml|SetCovTarget|GetCovTarget|IsCovered)\\b"
+        },
+        {
+          "name": "support.function.osvvm.scoreboard",
+          "match": "\\b(NewScoreboard|Push|Pop|Check|Empty|GetItemCount|GetPushCount|GetPopCount|GetCheckCount|GetDropCount|SetFinish|GetFinish|WriteScoreboardYaml|GetErrorCount)\\b"
+        },
+        {
+          "name": "support.function.osvvm.randomization",
+          "match": "\\b(RandInt|RandReal|RandSlv|RandUnsigned|RandSigned|RandTime|SetSeed|GetSeed|InitSeed|Uniform|FavorSmall|FavorBig|Normal|Poisson)\\b"
+        },
+        {
+          "name": "support.function.osvvm.memory",
+          "match": "\\b(NewMemory|MemInit|MemRead|MemWrite|MemErase|FileReadH|FileReadB|FileWriteH|FileWriteB|SetMemoryOptions|GetMemoryOptions)\\b"
+        }
+      ]
+    },
+    "tcl-keywords": {
+      "patterns": [
+        {
+          "name": "keyword.control.tcl",
+          "match": "\\b(if|then|else|elseif|for|foreach|while|switch|case|default|break|continue|return|proc|namespace|package|source|catch|try|finally|throw|error)\\b"
+        }
+      ]
+    },
+    "tcl-commands": {
+      "patterns": [
+        {
+          "name": "support.function.tcl",
+          "match": "\\b(set|unset|expr|list|lindex|llength|lappend|linsert|lreplace|lsort|lsearch|lrange|split|join|string|format|scan|regexp|regsub|subst|eval|uplevel|upvar|global|variable|array|dict|file|glob|pwd|cd|open|close|read|gets|puts|flush|eof|fblocked|fconfigure|fcopy|seek|tell|info|trace|rename|interp|load|exit|after|vwait|update|clock)\\b"
+        }
+      ]
+    },
+    "numbers": {
+      "patterns": [
+        {
+          "name": "constant.numeric.integer.osvvm",
+          "match": "\\b[0-9]+\\b"
+        },
+        {
+          "name": "constant.numeric.float.osvvm",
+          "match": "\\b[0-9]+\\.[0-9]+\\b"
+        },
+        {
+          "name": "constant.numeric.hex.osvvm",
+          "match": "\\b0x[0-9a-fA-F]+\\b"
+        }
+      ]
+    },
+    "operators": {
+      "patterns": [
+        {
+          "name": "keyword.operator.osvvm",
+          "match": "(==|!=|<=|>=|<|>|&&|\\|\\||!|\\+|-|\\*|/|%|&|\\||\\^|~|<<|>>)"
+        },
+        {
+          "name": "keyword.operator.assignment.osvvm",
+          "match": "="
+        }
+      ]
+    },
+    "brackets": {
+      "patterns": [
+        {
+          "name": "punctuation.bracket.square.osvvm",
+          "match": "[\\[\\]]"
+        },
+        {
+          "name": "punctuation.bracket.curly.osvvm",
+          "match": "[{}]"
+        },
+        {
+          "name": "punctuation.bracket.round.osvvm",
+          "match": "[()]"
+        }
+      ]
+    }
+  }
+}

@@ -35,6 +35,12 @@
     },
     "_ucf_file_dark": {
       "iconPath": "./dark/ucf.svg"
+    },
+    "_pro_file": {
+      "iconPath": "./light/pro.svg"
+    },
+    "_pro_file_dark": {
+      "iconPath": "./dark/pro.svg"
     }
   },
   "fileExtensions": {
@@ -47,7 +53,7 @@
     "sv": "_systemverilog_file",
     "svh": "_systemverilog_file",
     "tcl": "_tcl_file",
-    "pro": "_tcl_file",
+    "pro": "_pro_file",
     "xdc": "_xdc_file",
     "sdc": "_xdc_file",
     "ldc": "_xdc_file",
@@ -59,6 +65,7 @@
     "verilog": "_verilog_file",
     "systemverilog": "_systemverilog_file",
     "tcl": "_tcl_file",
+    "pro": "_pro_file",
     "xdc": "_xdc_file",
     "ldc": "_xdc_file",
     "ucf": "_ucf_file"
@@ -74,7 +81,7 @@
       "sv": "_systemverilog_file",
       "svh": "_systemverilog_file",
       "tcl": "_tcl_file",
-      "pro": "_tcl_file",
+      "pro": "_pro_file",
       "xdc": "_xdc_file",
       "sdc": "_xdc_file",
       "ldc": "_xdc_file",
@@ -86,6 +93,7 @@
       "verilog": "_verilog_file",
       "systemverilog": "_systemverilog_file",
       "tcl": "_tcl_file",
+      "pro": "_pro_file",
       "xdc": "_xdc_file",
       "ldc": "_xdc_file",
       "ucf": "_ucf_file"
@@ -102,7 +110,7 @@
       "sv": "_systemverilog_file_dark",
       "svh": "_systemverilog_file_dark",
       "tcl": "_tcl_file_dark",
-      "pro": "_tcl_file_dark",
+      "pro": "_pro_file_dark",
       "xdc": "_xdc_file_dark",
       "sdc": "_xdc_file_dark",
       "ldc": "_xdc_file_dark",
@@ -114,6 +122,7 @@
       "verilog": "_verilog_file_dark",
       "systemverilog": "_systemverilog_file_dark",
       "tcl": "_tcl_file_dark",
+      "pro": "_pro_file_dark",
       "xdc": "_xdc_file_dark",
       "ldc": "_xdc_file_dark",
       "ucf": "_ucf_file_dark"
