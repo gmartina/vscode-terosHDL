@@ -218,8 +218,9 @@ describe('ProjectManager Configuration', () => {
         const savedJson = projectManager.get_edam_json_for_save();
         
         // The saved configuration should NOT contain the global path
-        // (it should be undefined since it's not different from default/global)
-        expect(savedJson.configuration.tools.ghdl.installation_path).toBeUndefined();
+        // The tools section should be completely stripped because all values match defaults
+        // (installation_path defaults to "" which matches, and the global path is not saved)
+        expect(savedJson.configuration.tools).toBeUndefined();
     });
 
     it('should save project-specific values but not global paths', async () => {

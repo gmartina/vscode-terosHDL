@@ -677,7 +677,22 @@ export class Project_manager extends ConfigManager {
         return toml;
     }
 
+    /**
+     * Save project to YAML file with full configuration.
+     * This exports the complete merged configuration for documentation/reference purposes.
+     * Note: For sharing via VCS, consider using save_edam_yaml_for_vcs() instead.
+     */
     public save_edam_yaml(output_path: string) {
+        const edam_yaml = this.get_edam_yaml(output_path);
+        file_utils.save_file_sync(output_path, edam_yaml);
+    }
+
+    /**
+     * Save project to YAML file with only project-specific configuration.
+     * This excludes values that match the global config or defaults,
+     * making it suitable for sharing via version control systems.
+     */
+    public save_edam_yaml_for_vcs(output_path: string) {
         const edam_yaml = this.get_edam_yaml_for_save(output_path);
         file_utils.save_file_sync(output_path, edam_yaml);
     }
