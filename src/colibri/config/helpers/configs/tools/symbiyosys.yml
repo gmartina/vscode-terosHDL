@@ -1,8 +1,0 @@
-installation_path:
-  description: "Installation path:"
-  type: string
-  value: ""
-tasknames:
-  description: "A list of the .sby file’s tasks to run. Passed on the sby command line.."
-  type: array
-  value: []

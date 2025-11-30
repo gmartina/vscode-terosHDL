@@ -1,9 +1,0 @@
-vhdl_arguments:
-  description: "VHDL linter arguments."
-  type: string
-  value: ""
-
-verilog_arguments:
-  description: "Verilog/SV linter arguments."
-  type: string
-  value: ""

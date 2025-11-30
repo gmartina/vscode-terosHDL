@@ -1,5 +1,0 @@
-  reg [3:0] a;
-  reg b;
-  reg [3:0] c;
-  reg d;
-  reg e;

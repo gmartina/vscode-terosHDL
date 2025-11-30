@@ -1,6 +1,0 @@
-# Example configuration istyle formatter
-
-[general]
-# ansi, kr, gnu or onlyindent
-style = "ansi"
-indent_size = 2
